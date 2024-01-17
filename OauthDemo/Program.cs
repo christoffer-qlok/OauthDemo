@@ -14,7 +14,7 @@ namespace OauthDemo
 
             var spotifyClientId = builder.Configuration["SpotifyClientId"];
             var spotifyClientSecret = builder.Configuration["SpotifyClientSecret"];
-
+            var baseUrl = builder.Configuration["BaseUrl"].TrimEnd('/');
             var app = builder.Build();
 
             app.MapGet("/", () => "Hello World!");
@@ -25,7 +25,7 @@ namespace OauthDemo
                 {
                     { "client_id", spotifyClientId },
                     { "response_type", "code" },
-                    { "redirect_uri", "https://oauthdemonet23.azurewebsites.net/callback" },
+                    { "redirect_uri", $"{baseUrl}/callback" },
                     { "scope", "playlist-read-private playlist-read-collaborative user-read-private user-read-email" },
                     { "show_dialog", "true" }
                 };
@@ -52,7 +52,7 @@ namespace OauthDemo
                 {
                     { "grant_type", "authorization_code" },
                     { "code", code },
-                    { "redirect_uri", "https://oauthdemonet23.azurewebsites.net/callback" },
+                    { "redirect_uri", $"{baseUrl}/callback" },
                 };
 
                 using (var httpClient = new HttpClient())
