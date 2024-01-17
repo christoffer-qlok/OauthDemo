@@ -76,6 +76,7 @@ namespace OauthDemo
                     }
 
                     TokenResponse tokenResponse = JsonSerializer.Deserialize<TokenResponse>(responseData)!;
+
                     try
                     {
                         // Get user profile from spotify
