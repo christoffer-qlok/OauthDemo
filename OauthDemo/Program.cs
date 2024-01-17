@@ -76,30 +76,35 @@ namespace OauthDemo
                     }
 
                     TokenResponse tokenResponse = JsonSerializer.Deserialize<TokenResponse>(responseData)!;
-
-                    // Get user profile from spotify
-                    request = new HttpRequestMessage() { Method = HttpMethod.Get, RequestUri = new Uri("https://api.spotify.com/v1/me") };
-                    request.Headers.Add("Authorization", $"Bearer {tokenResponse.AccessToken}");
-
-                    response = await httpClient.SendAsync(request);
-                    responseData = await response.Content.ReadAsStringAsync()!;
-                    ProfileResponse profile = JsonSerializer.Deserialize<ProfileResponse>(responseData)!;
-
-                    // Get playlists for user
-                    request = new HttpRequestMessage() { Method = HttpMethod.Get, RequestUri = new Uri($"https://api.spotify.com/v1/users/{profile.Id}/playlists") };
-                    request.Headers.Add("Authorization", $"Bearer {tokenResponse.AccessToken}");
-
-                    response = await httpClient.SendAsync(request);
-                    responseData = await response.Content.ReadAsStringAsync()!;
-                    PlaylistResponse playlists = JsonSerializer.Deserialize<PlaylistResponse>(responseData)!;
-
-                    var viewModel = new CallbackViewModel()
+                    try
                     {
-                        DisplayName = profile.DisplayName,
-                        Playlists = playlists.Items.Select(i => i.Name).ToArray(),
-                    };
+                        // Get user profile from spotify
+                        request = new HttpRequestMessage() { Method = HttpMethod.Get, RequestUri = new Uri("https://api.spotify.com/v1/me") };
+                        request.Headers.Add("Authorization", $"Bearer {tokenResponse.AccessToken}");
 
-                    return Results.Json(viewModel);
+                        response = await httpClient.SendAsync(request);
+                        responseData = await response.Content.ReadAsStringAsync()!;
+                        ProfileResponse profile = JsonSerializer.Deserialize<ProfileResponse>(responseData)!;
+
+                        // Get playlists for user
+                        request = new HttpRequestMessage() { Method = HttpMethod.Get, RequestUri = new Uri($"https://api.spotify.com/v1/users/{profile.Id}/playlists") };
+                        request.Headers.Add("Authorization", $"Bearer {tokenResponse.AccessToken}");
+
+                        response = await httpClient.SendAsync(request);
+                        responseData = await response.Content.ReadAsStringAsync()!;
+                        PlaylistResponse playlists = JsonSerializer.Deserialize<PlaylistResponse>(responseData)!;
+
+                        var viewModel = new CallbackViewModel()
+                        {
+                            DisplayName = profile.DisplayName,
+                            Playlists = playlists.Items.Select(i => i.Name).ToArray(),
+                        };
+
+                        return Results.Json(viewModel);
+                    } catch  (Exception ex)
+                    {
+                        return Results.Json(ex);
+                    }
                 }
             });
 
